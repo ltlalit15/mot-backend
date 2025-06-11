@@ -1,5 +1,6 @@
-const Calendar = require("../models/bookingCalendar");  
+const Calendar = require("../models/bookingCalendar");
 
+// Create a new calendar booking
 exports.createCalendarBook = async (req, res) => {
   try {
     const calendar = new Calendar(req.body);
@@ -21,6 +22,7 @@ exports.createCalendarBook = async (req, res) => {
   }
 };
 
+// Get all calendar bookings
 exports.getCalendarBook = async (req, res) => {
   try {
     const calendar = await Calendar.find();
@@ -29,70 +31,70 @@ exports.getCalendarBook = async (req, res) => {
       data: calendar
     });
   } catch (error) {
-    console.error("Error fetching garage:", error);
+    console.error("Error fetching calendar:", error);
     res.status(500).json({
       status: false,
-      message: "Failed to fetch garage",
+      message: "Failed to fetch calendar",
       error: error.message
     });
   }
 };
 
-
+// Update a calendar booking by ID
 exports.updateBookCalendar = async (req, res) => {
   try {
-    const { Id } = req.params;  // Access clientId as Id
+    const { id } = req.params;
     const updateBookCalendar = await Calendar.findByIdAndUpdate(
-      Id, 
-      { $set: req.body }, 
+      id,
+      { $set: req.body },
       { new: true }
     );
 
     if (!updateBookCalendar) {
       return res.status(404).json({
         status: false,
-        message: "Calendar not found",
+        message: "Calendar not found"
       });
     }
 
     res.json({
       status: true,
       message: "Calendar updated successfully",
-      data: updateBookCalendar,
+      data: updateBookCalendar
     });
   } catch (error) {
     console.error("Error updating calendar:", error);
     res.status(400).json({
       status: false,
       message: "Failed to update calendar",
-      error: error.message,
+      error: error.message
     });
   }
 };
 
-// Delete Client
+// Delete a calendar booking by ID
 exports.deleteBookCalendar = async (req, res) => {
   try {
-    const { Id } = req.params;  // Access clientId as Id
-    const deleteBookCalendar = await Bookclient.findByIdAndDelete(Id);
+    const { id } = req.params;
+    const deleteBookCalendar = await Calendar.findByIdAndDelete(id);
 
     if (!deleteBookCalendar) {
       return res.status(404).json({
         status: false,
-        message: "Booking  not found",
+        message: "Booking not found"
       });
     }
 
     res.json({
       status: true,
-      message: "Booking  deleted successfully",
+      message: "Booking deleted successfully"
     });
   } catch (error) {
-    console.error("Error deleting Booking:", error);
+    console.error("Error deleting booking:", error);
     res.status(500).json({
       status: false,
-      message: "Failed to delete Bokking",
-      error: error.message,
+      message: "Failed to delete booking",
+      error: error.message
     });
   }
 };
