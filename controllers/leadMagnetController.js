@@ -91,3 +91,108 @@ exports.getAllLeadMagnets = async (req, res) => {
     });
   }
 };
+
+
+
+
+exports.editLeadMagnet = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      title,
+      type,
+      category,
+      description
+    } = req.body;
+
+    // Validate the category exists
+    if (category) {
+      const categoryExists = await Category.findById(category);
+      if (!categoryExists) {
+        return res.status(404).json({
+          status: false,
+          message: "Category not found"
+        });
+      }
+    }
+
+    let image = '';
+    if (req.files?.image) {
+      try {
+        const result = await cloudinary.uploader.upload(
+          req.files.image.tempFilePath,
+          { folder: 'member_measurements' }
+        );
+        image = result.secure_url;
+      } catch (uploadErr) {
+        console.error("Image upload error:", uploadErr);
+        return res.status(500).json({ status: false, message: "Image upload failed." });
+      }
+    }
+
+    // Build update data
+    const updateData = {
+      ...(title && { title }),
+      ...(type && { type }),
+      ...(category && { category }),
+      ...(description && { description }),
+      ...(image && { image })
+    };
+
+    const updatedLeadMagnet = await LeadMagnet.findByIdAndUpdate(id, updateData, {
+      new: true
+    });
+
+    if (!updatedLeadMagnet) {
+      return res.status(404).json({
+        status: false,
+        message: "Lead magnet not found"
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      message: "Lead magnet updated successfully",
+      data: updatedLeadMagnet
+    });
+  } catch (error) {
+    console.error("Error updating lead magnet:", error);
+    res.status(400).json({
+      status: false,
+      message: "Failed to update lead magnet",
+      error: error.message
+    });
+  }
+};
+
+
+
+
+
+exports.deleteLeadMagnet = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const leadMagnet = await LeadMagnet.findById(id);
+    if (!leadMagnet) {
+      return res.status(404).json({
+        status: false,
+        message: "Lead magnet not found"
+      });
+    }
+
+    await LeadMagnet.findByIdAndDelete(id);
+
+    res.status(200).json({
+      status: true,
+      message: "Lead magnet deleted successfully"
+    });
+  } catch (error) {
+    console.error("Error deleting lead magnet:", error);
+    res.status(500).json({
+      status: false,
+      message: "Failed to delete lead magnet",
+      error: error.message
+    });
+  }
+};
