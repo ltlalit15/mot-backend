@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const BookAppointment = require("../models/BookAppoitment");
 const Review = require("../models/Review");
+const mongoose = require("mongoose");
 
 exports.getDashboardData = async (req, res) => {
   const userId = req.params.userId;  // Get userId from the URL parameter
@@ -35,7 +36,9 @@ exports.getDashboardData = async (req, res) => {
     ).length;
 
     // Reviews Given (Count of reviews submitted by the user)
-    const reviewsGiven = await Review.countDocuments({ "user": userId });
+   const reviewsGiven = await Review.countDocuments({
+  userId: new mongoose.Types.ObjectId(userId) // Ensure userId is passed as ObjectId using 'new'
+});
 
     // Recent Activity (Recent 3 activities: MOT Test, Services, or Reviews)
     const recentActivity = userAppointments.slice(0, 3).map(appointment => ({
@@ -49,19 +52,17 @@ exports.getDashboardData = async (req, res) => {
     // Dynamically generate available resources based on user activity
     const availableResources = [];
 
-    // Check if the user has completed a service recently
     if (pastServices > 0) {
       availableResources.push({
         title: "Service Manual",
-        url: "https://example.com/service-manual"  // Link to service manual
+        url: "https://example.com/service-manual"
       });
       availableResources.push({
         title: "Vehicle Maintenance Guide",
-        url: "https://example.com/vehicle-maintenance-guide"  // Link to maintenance guide
+        url: "https://example.com/vehicle-maintenance-guide"
       });
     }
 
-    // Check if the user's MOT is due soon (within 45 days)
     const motDueSoon = userAppointments.some(appointment => {
       const motDueDate = appointment.vehicle.lastMotDate;
       const diffInDays = (new Date(motDueDate) - new Date()) / (1000 * 3600 * 24);
@@ -71,15 +72,14 @@ exports.getDashboardData = async (req, res) => {
     if (motDueSoon) {
       availableResources.push({
         title: "MOT Checklist",
-        url: "https://example.com/mot-checklist"  // Link to MOT checklist
+        url: "https://example.com/mot-checklist"
       });
       availableResources.push({
         title: "Pre-MOT Inspection Guide",
-        url: "https://example.com/pre-mot-guide"  // Link to pre-MOT inspection guide
+        url: "https://example.com/pre-mot-guide"
       });
     }
 
-    // Example: Account Reactivation Notification
     const notifications = [];
 
     if (!user.accountActivated) {
@@ -90,7 +90,6 @@ exports.getDashboardData = async (req, res) => {
       });
     }
 
-    // If MOT due soon, add a notification
     if (!user.motDueSoon) {
       notifications.push({
         title: "MOT Due Soon",
@@ -99,7 +98,6 @@ exports.getDashboardData = async (req, res) => {
       });
     }
 
-    // Construct the dashboard data to return
     const dashboardData = {
       welcomeMessage: `Welcome Back, ${user.name}!`,
       activeVehicles,
@@ -110,7 +108,6 @@ exports.getDashboardData = async (req, res) => {
       availableResources
     };
 
-    // Return the dashboard data
     res.status(200).json({
       status: true,
       message: 'Retrieved Dashboard data successfully',
