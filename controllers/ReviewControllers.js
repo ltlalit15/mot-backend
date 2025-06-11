@@ -106,3 +106,94 @@ exports.getAllReviews = async (req, res) => {
     });
   }
 };
+
+
+
+
+exports.editReview = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rating } = req.body;
+
+    // Validate rating if provided
+    if (rating && (rating < 1 || rating > 5)) {
+      return res.status(400).json({
+        status: false,
+        message: "Rating must be between 1 and 5.",
+      });
+    }
+
+    let imageUrls = [];
+
+    // Handle image uploads if present
+    if (req.files?.image) {
+      const imageArray = req.files.image instanceof Array ? req.files.image : [req.files.image];
+      for (let image of imageArray) {
+        try {
+          const result = await cloudinary.uploader.upload(image.tempFilePath, { folder: "member_images" });
+          imageUrls.push(result.secure_url);
+        } catch (uploadErr) {
+          console.error("Image upload error:", uploadErr);
+          return res.status(500).json({ status: false, message: "Image upload failed." });
+        }
+      }
+    }
+
+    const updatedData = {
+      ...req.body,
+      ...(imageUrls.length > 0 && { image: imageUrls })  // update image only if new ones are uploaded
+    };
+
+    const updatedReview = await Review.findByIdAndUpdate(id, { $set: updatedData }, { new: true });
+
+    if (!updatedReview) {
+      return res.status(404).json({
+        status: false,
+        message: "Review not found.",
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      message: "Review updated successfully",
+      data: updatedReview,
+    });
+  } catch (error) {
+    console.error("Error updating review:", error);
+    res.status(400).json({
+      status: false,
+      message: "Failed to update review",
+      error: error.message,
+    });
+  }
+};
+
+
+
+
+exports.deleteReview = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedReview = await Review.findByIdAndDelete(id);
+
+    if (!deletedReview) {
+      return res.status(404).json({
+        status: false,
+        message: "Review not found.",
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      message: "Review deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting review:", error);
+    res.status(500).json({
+      status: false,
+      message: "Failed to delete review",
+      error: error.message,
+    });
+  }
+};
