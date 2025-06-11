@@ -85,43 +85,44 @@ exports.createStaff = async (req, res) => {
 
 exports.getAllStaff = async (req, res) => {
   try {
-    // Fetch all staff members from the database
-    const staffMembers = await Staff.find();
+    // Fetch all staff data from the database
+    const staffData = await Staff.find(); // Assuming you have a Staff model that stores staff details
+    
+    // Calculate total number of staff
+    const totalStaff = staffData.length; 
 
-    if (!staffMembers || staffMembers.length === 0) {
-      return res.status(404).json({
-        status: false,
-        message: "No staff found."
-      });
-    }
+    // Calculate active staff
+    const activeStaff = staffData.filter(staff => staff.status === 'Active').length;
 
-    // Return the staff members' data, including schedule and permissions
+    // Calculate staff on leave
+    const onLeaveStaff = staffData.filter(staff => staff.status === 'on_leave').length;
+
+    // Calculate new hires in the last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const newHires = staffData.filter(staff => new Date(staff.createdAt) > thirtyDaysAgo).length;
+
     res.status(200).json({
       status: true,
-      message: "Staff retrieved successfully",
-      data: staffMembers.map(staff => ({
-        _id: staff._id,
-        fullName: staff.fullName,
-        email: staff.email,
-        phone: staff.phone,
-        image: staff.image,  // Ensure image is returned as an array of URLs
-        department: staff.department,
-        role: staff.role,
-        joiningDate: staff.joiningDate,
-        status: staff.status,
-        schedule: staff.schedule,
-        permissions: staff.permissions
-      }))
+      message: "Staff data fetched successfully",
+      data: {
+        totalStaff,
+        activeStaff,
+        onLeaveStaff,
+        newHires,
+        staffData  // Include all staff data as well
+      }
     });
   } catch (error) {
-    console.error("Error fetching staff members:", error);
+    console.error("Error fetching staff:", error);
     res.status(500).json({
       status: false,
-      message: "Failed to fetch staff",
+      message: "Failed to fetch staff data",
       error: error.message
     });
   }
 };
+
 
 
 exports.editStaff = async (req, res) => {
