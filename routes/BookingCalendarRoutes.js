@@ -6,8 +6,8 @@ const authMiddleware = require("../Middleware/authMiddleware")
 
 router.post('/', authMiddleware, createCalendarBook)
 router.get('/', authMiddleware, getCalendarBook )
-router.put("/update/:Id", authMiddleware, updateBookCalendar);
-router.delete("/delete/:Id", authMiddleware, deleteBookCalendar);
+router.patch("/:id", authMiddleware, updateBookCalendar);
+router.delete("/:id", authMiddleware, deleteBookCalendar);
 
 
 
