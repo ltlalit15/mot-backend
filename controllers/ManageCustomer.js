@@ -1,6 +1,6 @@
 const Customer = require("../models/ManageCustomer");
 
-exports.createCustomer = async (req, res) => {
+exports.createManageCustomer = async (req, res) => {
   try {
     const customer = new Customer(req.body);
     console.log("customer");
@@ -15,38 +15,32 @@ exports.createCustomer = async (req, res) => {
   }
 };
 
-exports.getCustomer = async (req, res) => {
+
+exports.getAllManageCustomer = async (req, res) => {
   try {
-    // Fetch full appointments
-    const appointments = await Customer.find().sort({ dateTime: -1 }).lean();
+    // Fetch all customers from the database
+    const customers = await Customer.find();
 
-    // Summary counts
-    const total = appointments.length;
-    const confirmed = appointments.filter(a => a.status === "confirmed").length;
-    const pending = appointments.filter(a => a.status === "pending").length;
-    const cancelled = appointments.filter(a => a.status === "cancelled").length;
+    // Check if there are no customers
+    if (customers.length === 0) {
+      return res.status(404).json({
+        status: false,
+        message: "No customers found"
+      });
+    }
 
-    // Recent activities (last 10)
-    const recentActivities = appointments.slice(0, 10).map(item => {
-      let actionText = "";
-      switch (item.status) {
-        case "confirmed": actionText = `Appointment Confirmed - ${item.customer} - ${item.serviceType}`; break;
-        case "pending": actionText = `New Appointment Created - ${item.customer} - ${item.serviceType}`; break;
-        case "cancelled": actionText = `Appointment Cancelled - ${item.customer} - ${item.serviceType}`; break;
-        default: actionText = `Appointment Updated - ${item.customer} - ${item.serviceType}`;
-      }
-      const dateStr = new Date(item.dateTime).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-      return `${actionText} - ${dateStr}`;
+    res.status(200).json({
+      status: true,
+      message: "Customers retrieved successfully",
+      data: customers
     });
-
-    res.json({
-      summary: { total, confirmed, pending, cancelled },
-      appointments,
-      recentActivities
-    });
-
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error fetching customers:", error);
+    res.status(500).json({
+      status: false,
+      message: "Failed to fetch customers",
+      error: error.message
+    });
   }
 };
 
