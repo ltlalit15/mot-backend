@@ -64,9 +64,6 @@ app.use("/api/garage", GarageRoutes);
 const CalendarRoutes = require("./routes/BookingCalendarRoutes");
 app.use("/api/calendar", CalendarRoutes);
 
-const CustomerRoutes = require("./routes/CustomerRoutes");
-app.use("/api/customer", CustomerRoutes);
-
 const ClientRoutes = require("./routes/ClientManageRoutes");
 app.use("/api/client", ClientRoutes);
 
@@ -88,6 +85,9 @@ app.use("/api/adminDashboard", adminDashboardRoutes);
 
 const reportDashbaordRoutes = require("./routes/reportDashboardRoutes");
 app.use("/api/reportDashboard", reportDashbaordRoutes);
+
+const ManageCustomerRoutes = require("./routes/ManageCustomerRoutes");
+app.use("/api/ManageCustomer", ManageCustomerRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
