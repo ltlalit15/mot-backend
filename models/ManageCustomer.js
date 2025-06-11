@@ -5,7 +5,7 @@ const customerSchema = new mongoose.Schema({
 
   customer: { type: String, required: true },
   vehicleDetails: String,
-  dateTime: Date,
+  dateTime: String,
   serviceType: String,
   status: String,
   
