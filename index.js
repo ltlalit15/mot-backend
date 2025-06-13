@@ -16,9 +16,10 @@ connectDB();
 
 const app = express();
 app.use(cors({
-  origin: "*",
+  origin: "http://localhost:5173",
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
 }));
 // ✅ Increase Payload Limit for Base64 Images
 app.use(express.json({ limit: '50mb' }));
