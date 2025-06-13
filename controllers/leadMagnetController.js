@@ -27,7 +27,7 @@ exports.createLeadMagnet = async (req, res) => {
       });
     }
 
-      let image = ''; 
+      let image = []; 
   if (req.files?.image) {
     try {
       const result = await cloudinary.uploader.upload(
