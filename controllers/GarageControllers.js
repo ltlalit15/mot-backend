@@ -1,5 +1,6 @@
 const Garage = require("../models/Garage");  
 const Staff = require("../models/Staff");
+const Service = require("../models/service");
 // const Service = require("../models/Service");
 const Booking = require("../models/BookAppoitment");
 const mongoose = require("mongoose");
