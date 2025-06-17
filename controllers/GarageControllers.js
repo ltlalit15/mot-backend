@@ -33,6 +33,40 @@ exports.createGarage = async (req, res) => {
 };
 
 
+
+// exports.getAllGarages = async (req, res) => {
+//   try {
+//     // Find all garages in the collection
+//     const garages = await Garage.find();
+
+//     // If no garages are found, return an empty array
+//     if (!garages || garages.length === 0) {
+//       return res.status(404).json({
+//         status: false,
+//         message: "No garages found"
+//       });
+//     }
+
+//     // Respond with the list of garages
+//     res.status(200).json({
+//       status: true,
+//       message: "Garages retrieved successfully",
+//       data: garages
+//     });
+//   } catch (error) {
+//     console.error("Error retrieving garages:", error);
+//     res.status(500).json({
+//       status: false,
+//       message: "Failed to retrieve garages",
+//       error: error.message
+//     });
+//   }
+// };
+
+
+
+
+
 exports.getAllGarages = async (req, res) => {
   try {
     // Find all garages in the collection
@@ -46,11 +80,25 @@ exports.getAllGarages = async (req, res) => {
       });
     }
 
-    // Respond with the list of garages
+    // Count the total number of garages
+    const totalGarages = await Garage.countDocuments();
+
+    // Count the total number of staff
+    const totalStaff = await Staff.countDocuments();
+
+    // Count the total number of services
+    const totalServices = await Service.countDocuments();
+
+    // Respond with the list of garages and counts
     res.status(200).json({
       status: true,
       message: "Garages retrieved successfully",
-      data: garages
+      data: {
+        garages,
+        totalGarages,
+        totalStaff,
+        totalServices
+      }
     });
   } catch (error) {
     console.error("Error retrieving garages:", error);
