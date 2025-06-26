@@ -12,7 +12,7 @@ cloudinary.config({
 // Create New Service
 exports.createService = async (req, res) => {
   try {
-    const { title, description, tag, lastUpdated } = req.body;
+    const { title, description, status } = req.body;
 
   
     // Upload image(s) to Cloudinary
@@ -30,8 +30,7 @@ exports.createService = async (req, res) => {
     const service = new Service({
       title,
       description,
-      tag,
-      lastUpdated: new Date(lastUpdated),
+      status,
       images: imageUrls,
     });
 
