@@ -142,3 +142,35 @@ exports.getAllUsers = async (req, res) => {
     });
   }
 };
+
+
+exports.changePassword = async (req, res) => {
+  try {
+    const { adminId, currentPassword, newPassword, confirmNewPassword } = req.body;
+
+    if (!adminId || !currentPassword || !newPassword || !confirmNewPassword) {
+      return res.status(400).json({ status: false, message: "All fields are required." });
+    }
+
+    const admin = await User.findById(adminId);
+
+    if (!admin) {
+      return res.status(404).json({ status: false, message: "Admin not found." });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, admin.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ status: false, message: "Current password is incorrect." });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    admin.password = hashedPassword;
+    await admin.save();
+
+    res.status(200).json({ status: true, message: "Password changed successfully." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: false, message: "Something went wrong." });
+  }
+};
