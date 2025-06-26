@@ -96,6 +96,10 @@ app.use("/api/vehicle", vehicleRoutes);
 const vehicleBulkRoutes = require("./routes/vehicleBulkRoutes");
 app.use("/api/vehicleBulk", vehicleBulkRoutes);
 
+
+const closedDayRoutes = require("./routes/closedDayRoutes");
+app.use("/api/closedDay", closedDayRoutes);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
 
