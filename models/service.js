@@ -6,8 +6,8 @@ const serviceSchema = new mongoose.Schema({
     required: true,
   },
   description: String,
-  tag: String,
-  lastUpdated: {
+
+  status: {
     type: String,
    
   },
