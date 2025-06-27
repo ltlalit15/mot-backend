@@ -102,6 +102,9 @@ app.use("/api/closedDay", closedDayRoutes);
 const EmailTemplateRoutes = require("./routes/EmailTemplateRoutes");
 app.use("/api/EmailTemplate", EmailTemplateRoutes);
 
+const SystemRoutes = require("./routes/SystemRoutes");
+app.use("/api/System", SystemRoutes);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
 
