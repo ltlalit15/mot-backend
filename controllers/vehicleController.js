@@ -16,7 +16,7 @@ exports.vehicleDetails = async (req, res) => {
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          'x-api-key': 'TyXPUVYKfvpnu5bVq4113OAZhWtC3qy9cq4kRjd2', 
+          'x-api-key': 'xC9Am3By2v5ibQC0gAeVZ6DRtGpKDZ5h7qKKHcmF', 
           Accept: 'application/json',
         },
       }
