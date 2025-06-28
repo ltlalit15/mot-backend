@@ -11,8 +11,8 @@ const fetchToken = async () => {
       'https://login.microsoftonline.com/a455b827-244f-4c97-b5b4-ce5d13b4d00c/oauth2/v2.0/token',
       new URLSearchParams({
         grant_type: 'client_credentials',
-        client_id: 'e8711e26-ff10-49f2-9e61-8b262496d510',
-        client_secret: 'r6y8Q~fc8tKkU.AYG4pDPfIfBTpgAtriqDWH6c_B',
+        client_id: '22068bb2-bea8-44d1-a5b8-141006303e3e',
+        client_secret: 'bOS8Q~UNK_J4_D.n_Q1vBUzy76J.PSiQxA6iXbg8',
         scope: 'https://tapi.dvsa.gov.uk/.default',
       }).toString(),
       {
