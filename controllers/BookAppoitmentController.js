@@ -38,20 +38,11 @@ exports.BookAppointment = async (req, res) => {
       selectedDate,
       selectedTime,
       selectedServices,
-      additionalServices,
-      motTestCost,
-      additionalServicesCost,
-      totalCost,
-      reactivationFee,
-      administrativeProcessing,
-      vat,
-      paymentMethod,
-      cardDetails,
-      billingAddress,
-      userId  
+      userId,
+      paymentMethod   // Now expecting fullName, emailAddress, phoneNumber, amount, paymentPurpose
     } = req.body;
 
-    // Validate vehicleRegistration is not null or empty
+    // Validate vehicleRegistration
     if (!vehicleRegistration || vehicleRegistration.trim() === "") {
       return res.status(400).json({
         status: false,
@@ -59,9 +50,7 @@ exports.BookAppointment = async (req, res) => {
       });
     }
 
-    
-
-    // Check if the user exists
+    // Validate user existence
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({
@@ -70,7 +59,16 @@ exports.BookAppointment = async (req, res) => {
       });
     }
 
-    // Create a new booking
+    // Validate required payment fields
+    const { fullName, emailAddress, phoneNumber, amount, paymentPurpose } = paymentMethod || {};
+    if (!fullName || !emailAddress || !phoneNumber || !amount || !paymentPurpose) {
+      return res.status(400).json({
+        status: false,
+        message: 'All payment fields are required (fullName, emailAddress, phoneNumber, amount, paymentPurpose).'
+      });
+    }
+
+    // Create booking document
     const newBookAppointment = new BookAppointment({
       vehicle: {
         vehicleRegistration,
@@ -90,36 +88,27 @@ exports.BookAppointment = async (req, res) => {
         selectedTime,
         selectedServices
       },
-      bookingSummary: {
-        additionalServices,
-        costSummary: {
-          motTest: motTestCost,
-          additionalServices: additionalServicesCost,
-          total: totalCost
+      paymentDetails: {
+        paymentMethod: {
+          fullName,
+          emailAddress,
+          phoneNumber,
+          amount,
+          paymentPurpose
         }
       },
-      paymentDetails: {
-        reactivationFee,
-        administrativeProcessing,
-        vat,
-        total: totalCost + reactivationFee + administrativeProcessing + vat,
-        paymentMethod,
-        paymentStatus: 'pending',
-        cardDetails,
-        billingAddress
-      },
-       userId: userId 
+      userId
     });
 
-    // Save the booking to the database
+    // Save to DB
     await newBookAppointment.save();
 
-    // Return the booking details in the response
-    res.status(201).json({
+    return res.status(201).json({
       status: true,
       message: 'Booking successfully created',
       data: newBookAppointment
     });
+
   } catch (error) {
     console.error("Error creating booking:", error);
     res.status(400).json({ error: error.message });
