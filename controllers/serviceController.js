@@ -69,3 +69,81 @@ exports.getAllServices = async (req, res) => {
   }
 };
 
+
+exports.updateService = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, status } = req.body;
+
+    const service = await Service.findById(id);
+    if (!service) {
+      return res.status(404).json({ success: false, message: "Service not found" });
+    }
+
+    // Upload new images if provided
+    let imageUrls = service.images; // keep old images unless replaced
+    if (req.files?.image) {
+      const files = Array.isArray(req.files.image) ? req.files.image : [req.files.image];
+
+      // Optional: you can delete old images from Cloudinary if you store `public_id` in DB
+
+      imageUrls = [];
+      for (const file of files) {
+        const uploadResult = await cloudinary.uploader.upload(file.tempFilePath, {
+          folder: 'services'
+        });
+        imageUrls.push(uploadResult.secure_url);
+      }
+    }
+
+    // Update service fields
+    service.title = title ?? service.title;
+    service.description = description ?? service.description;
+    service.status = status ?? service.status;
+    service.images = imageUrls;
+
+    await service.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Service updated successfully",
+      data: service
+    });
+
+  } catch (error) {
+    console.error("Update service error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
+
+exports.deleteService = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const service = await Service.findById(id);
+    if (!service) {
+      return res.status(404).json({ success: false, message: "Service not found" });
+    }
+
+    await Service.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+      message: "Service deleted successfully"
+    });
+
+  } catch (error) {
+    console.error("Delete service error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
+
+
+
+
+
+
