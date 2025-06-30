@@ -22,6 +22,14 @@ const bookAppoitSchema = new mongoose.Schema({
       repairs: { type: String }
     }]
   },
+   bookingSummary: {
+    additionalServices: [
+      {
+        serviceName: { type: String, required: true },
+        price: { type: Number, required: true }
+      }
+    ]
+  },
   paymentDetails: {
     paymentMethod: {
       fullName: { type: String, required: true },
