@@ -39,10 +39,11 @@ exports.BookAppointment = async (req, res) => {
       selectedTime,
       selectedServices,
       userId,
-      paymentMethod   // optional
+      paymentMethod,
+      bookingSummary // optional: { additionalServices: [] }
     } = req.body;
 
-    // Validate vehicleRegistration
+    // Validate vehicle registration
     if (!vehicleRegistration || vehicleRegistration.trim() === "") {
       return res.status(400).json({
         status: false,
@@ -59,7 +60,7 @@ exports.BookAppointment = async (req, res) => {
       });
     }
 
-    // Prepare the booking object
+    // Build booking object
     const bookingData = {
       vehicle: {
         vehicleRegistration,
@@ -82,7 +83,7 @@ exports.BookAppointment = async (req, res) => {
       userId
     };
 
-    // Conditionally add paymentDetails if paymentMethod is provided
+    // Conditionally add paymentDetails if paymentMethod exists
     if (paymentMethod) {
       const { fullName, emailAddress, phoneNumber, amount, paymentPurpose } = paymentMethod;
       bookingData.paymentDetails = {
@@ -96,7 +97,14 @@ exports.BookAppointment = async (req, res) => {
       };
     }
 
-    // Save booking
+    // Conditionally add bookingSummary if additionalServices exist
+    if (bookingSummary && Array.isArray(bookingSummary.additionalServices)) {
+      bookingData.bookingSummary = {
+        additionalServices: bookingSummary.additionalServices
+      };
+    }
+
+    // Save to database
     const newBookAppointment = new BookAppointment(bookingData);
     await newBookAppointment.save();
 
@@ -108,7 +116,10 @@ exports.BookAppointment = async (req, res) => {
 
   } catch (error) {
     console.error("Error creating booking:", error);
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({
+      status: false,
+      message: error.message
+    });
   }
 };
 
