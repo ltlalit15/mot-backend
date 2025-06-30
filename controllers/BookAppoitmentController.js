@@ -39,7 +39,7 @@ exports.BookAppointment = async (req, res) => {
       selectedTime,
       selectedServices,
       userId,
-      paymentMethod   // Now expecting fullName, emailAddress, phoneNumber, amount, paymentPurpose
+      paymentMethod   // optional
     } = req.body;
 
     // Validate vehicleRegistration
@@ -59,17 +59,8 @@ exports.BookAppointment = async (req, res) => {
       });
     }
 
-    // Validate required payment fields
- //   const { fullName, emailAddress, phoneNumber, amount, paymentPurpose } = paymentMethod || {};
- //   if (!fullName || !emailAddress || !phoneNumber || !amount || !paymentPurpose) {
- //     return res.status(400).json({
- //       status: false,
- //       message: 'All payment fields are required (fullName, emailAddress, phoneNumber, amount, paymentPurpose).'
-//      });
- //   }
-
-    // Create booking document
-    const newBookAppointment = new BookAppointment({
+    // Prepare the booking object
+    const bookingData = {
       vehicle: {
         vehicleRegistration,
         vinNumber,
@@ -88,7 +79,13 @@ exports.BookAppointment = async (req, res) => {
         selectedTime,
         selectedServices
       },
-      paymentDetails: {
+      userId
+    };
+
+    // Conditionally add paymentDetails if paymentMethod is provided
+    if (paymentMethod) {
+      const { fullName, emailAddress, phoneNumber, amount, paymentPurpose } = paymentMethod;
+      bookingData.paymentDetails = {
         paymentMethod: {
           fullName,
           emailAddress,
@@ -96,11 +93,11 @@ exports.BookAppointment = async (req, res) => {
           amount,
           paymentPurpose
         }
-      },
-      userId
-    });
+      };
+    }
 
-    // Save to DB
+    // Save booking
+    const newBookAppointment = new BookAppointment(bookingData);
     await newBookAppointment.save();
 
     return res.status(201).json({
