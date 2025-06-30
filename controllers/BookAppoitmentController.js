@@ -60,13 +60,13 @@ exports.BookAppointment = async (req, res) => {
     }
 
     // Validate required payment fields
-    const { fullName, emailAddress, phoneNumber, amount, paymentPurpose } = paymentMethod || {};
-    if (!fullName || !emailAddress || !phoneNumber || !amount || !paymentPurpose) {
-      return res.status(400).json({
-        status: false,
-        message: 'All payment fields are required (fullName, emailAddress, phoneNumber, amount, paymentPurpose).'
-      });
-    }
+ //   const { fullName, emailAddress, phoneNumber, amount, paymentPurpose } = paymentMethod || {};
+ //   if (!fullName || !emailAddress || !phoneNumber || !amount || !paymentPurpose) {
+ //     return res.status(400).json({
+ //       status: false,
+ //       message: 'All payment fields are required (fullName, emailAddress, phoneNumber, amount, paymentPurpose).'
+//      });
+ //   }
 
     // Create booking document
     const newBookAppointment = new BookAppointment({
