@@ -48,63 +48,43 @@ exports.createGarageUpload = async (req, res) => {
 
 exports.getCombinedGarageData = async (req, res) => {
   try {
-    const { garageId } = req.params;
+    // Fetch all garages
+    const garages = await Garage.find();
 
-    if (!garageId || !mongoose.Types.ObjectId.isValid(garageId)) {
-      return res.status(400).json({
-        status: false,
-        message: "Valid garageId is required in URL params"
-      });
-    }
+    // Fetch all uploads
+    const uploads = await GarageUpload.find();
 
-    const garageObjectId = new mongoose.Types.ObjectId(garageId);
+    // Combine each garage with its corresponding uploads
+    const combinedData = garages.map(garage => {
+      const matchingUploads = uploads.filter(
+        upload => upload.garageId.toString() === garage._id.toString()
+      );
 
-    const garage = await Garage.findById(garageObjectId);
-    const uploads = await GarageUpload.find({ garageId: garageObjectId });
-
-    console.log("Garage found:", garage);
-    console.log("Uploads found:", uploads);
-
-    if (!garage && uploads.length === 0) {
-      return res.status(404).json({
-        status: false,
-        message: "No data found for the provided garageId"
-      });
-    }
-
-    const garageEntry = garage ? {
-      _id: garage._id,
-      garageId: garage._id,
-      garageName: garage.garageName,
-      email: garage.email,
-      phone: garage.phone,
-      address: garage.address,
-      availableService: garage.availableService,
-     
-    } : null;
-
-    const uploadEntries = uploads.map(upload => ({
-      _id: upload._id,
-      garageId: upload.garageId,
-      image: upload.image,
-      createdAt: upload.createdAt,
-      updatedAt: upload.updatedAt,
-    
-    }));
-
-    const combined = [
-      ...(garageEntry ? [garageEntry] : []),
-      ...uploadEntries
-    ];
+      return {
+        _id: garage._id,
+        garageId: garage._id,
+        garageName: garage.garageName,
+        email: garage.email,
+        phone: garage.phone,
+        address: garage.address,
+        availableService: garage.availableService,
+        uploads: matchingUploads.map(upload => ({
+          _id: upload._id,
+          image: upload.image,
+          createdAt: upload.createdAt,
+          updatedAt: upload.updatedAt
+        }))
+      };
+    });
 
     res.status(200).json({
       status: true,
-      message: "Combined garage data fetched successfully",
-      data: combined
+      message: "All garages with uploads fetched successfully",
+      data: combinedData
     });
 
   } catch (error) {
-    console.error("Error fetching combined garage data:", error);
+    console.error("Error fetching all combined garage data:", error);
     res.status(500).json({
       status: false,
       message: "Internal server error",
@@ -112,3 +92,4 @@ exports.getCombinedGarageData = async (req, res) => {
     });
   }
 };
+
