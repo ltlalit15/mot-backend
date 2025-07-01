@@ -67,6 +67,8 @@ exports.getCombinedGarageData = async (req, res) => {
         email: garage.email,
         phone: garage.phone,
         address: garage.address,
+        opertingHours:garage.opertingHours,
+        status:garage.status,
         availableService: garage.availableService,
         uploads: matchingUploads.map(upload => ({
           _id: upload._id,
