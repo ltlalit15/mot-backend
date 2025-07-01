@@ -4,12 +4,11 @@ const Review = require("../models/Review");
 const mongoose = require("mongoose");
 
 exports.getDashboardData = async (req, res) => {
-  const userId = req.params.userId;  // Get userId from the URL parameter
+  const userId = req.params.userId;
 
   try {
-    // Fetch user details from the database
+    // Fetch user details
     const user = await User.findById(userId);
-
     if (!user) {
       return res.status(404).json({
         status: false,
@@ -17,8 +16,8 @@ exports.getDashboardData = async (req, res) => {
       });
     }
 
-    // Fetch all BookAppointments associated with the userId
-    const userAppointments = await BookAppointment.find({ "userId": userId });
+    // Fetch user appointments
+    const userAppointments = await BookAppointment.find({ userId: userId });
 
     if (!userAppointments || userAppointments.length === 0) {
       return res.status(404).json({
@@ -27,77 +26,90 @@ exports.getDashboardData = async (req, res) => {
       });
     }
 
-    // Active Vehicles Count (Count vehicles associated with this user)
-    const activeVehicles = userAppointments.length;  // Assuming each appointment corresponds to a vehicle
+    // Active Vehicles Count (assuming 1 appointment = 1 vehicle)
+    const activeVehicles = userAppointments.length;
 
-    // Past Services Count (Count of completed services for the user)
-    const pastServices = userAppointments.filter(appointment => 
-      appointment.bookingSummary.costSummary.total > 0  // Completed services
+    // Past Services Count (only count appointments with total > 0)
+    const pastServices = userAppointments.filter(appointment =>
+      appointment?.bookingSummary?.costSummary?.total > 0
     ).length;
 
-    // Reviews Given (Count of reviews submitted by the user)
-   const reviewsGiven = await Review.countDocuments({
-  userId: new mongoose.Types.ObjectId(userId) // Ensure userId is passed as ObjectId using 'new'
-});
+    // Reviews Given
+    const reviewsGiven = await Review.countDocuments({
+      userId: new mongoose.Types.ObjectId(userId)
+    });
 
-    // Recent Activity (Recent 3 activities: MOT Test, Services, or Reviews)
-    const recentActivity = userAppointments.slice(0, 3).map(appointment => ({
-      date: appointment.appointmentDetails.selectedDate,
-      type: appointment.bookingSummary.costSummary.total > 0 ? "Service" : "MOT Test",
-      description: appointment.bookingSummary.costSummary.total > 0
-        ? `Service completed - £${appointment.bookingSummary.costSummary.total}`
-        : `MOT Test completed - £${appointment.bookingSummary.costSummary.total}`,
-    }));
+    // Recent Activities (latest 3 from appointments)
+    const recentActivity = userAppointments
+      .slice(0, 3)
+      .map(appointment => {
+        const total = appointment?.bookingSummary?.costSummary?.total || 0;
+        return {
+          date: appointment?.appointmentDetails?.selectedDate || null,
+          type: total > 0 ? "Service" : "MOT Test",
+          description: total > 0
+            ? `Service completed - £${total}`
+            : `MOT Test completed - £${total}`,
+        };
+      });
 
-    // Dynamically generate available resources based on user activity
+    // Resources Based on Activity
     const availableResources = [];
 
     if (pastServices > 0) {
-      availableResources.push({
-        title: "Service Manual",
-        url: "https://example.com/service-manual"
-      });
-      availableResources.push({
-        title: "Vehicle Maintenance Guide",
-        url: "https://example.com/vehicle-maintenance-guide"
-      });
+      availableResources.push(
+        {
+          title: "Service Manual",
+          url: "https://example.com/service-manual"
+        },
+        {
+          title: "Vehicle Maintenance Guide",
+          url: "https://example.com/vehicle-maintenance-guide"
+        }
+      );
     }
 
+    // Check if any MOT is due within 45 days
     const motDueSoon = userAppointments.some(appointment => {
-      const motDueDate = appointment.vehicle.lastMotDate;
+      const motDueDate = appointment?.vehicle?.lastMotDate;
+      if (!motDueDate) return false;
       const diffInDays = (new Date(motDueDate) - new Date()) / (1000 * 3600 * 24);
       return diffInDays <= 45 && diffInDays >= 0;
     });
 
     if (motDueSoon) {
-      availableResources.push({
-        title: "MOT Checklist",
-        url: "https://example.com/mot-checklist"
-      });
-      availableResources.push({
-        title: "Pre-MOT Inspection Guide",
-        url: "https://example.com/pre-mot-guide"
-      });
+      availableResources.push(
+        {
+          title: "MOT Checklist",
+          url: "https://example.com/mot-checklist"
+        },
+        {
+          title: "Pre-MOT Inspection Guide",
+          url: "https://example.com/pre-mot-guide"
+        }
+      );
     }
 
+    // Notifications
     const notifications = [];
 
     if (!user.accountActivated) {
       notifications.push({
         title: "Account Reactivation",
         message: "Please complete the reactivation process to maintain full access to your account.",
-        type: "alert",
+        type: "alert"
       });
     }
 
-    if (!user.motDueSoon) {
+    if (motDueSoon) {
       notifications.push({
         title: "MOT Due Soon",
         message: "Your MOT is due in 45 days.",
-        type: "info",
+        type: "info"
       });
     }
 
+    // Final Dashboard Response
     const dashboardData = {
       welcomeMessage: `Welcome Back, ${user.name}!`,
       activeVehicles,
@@ -123,3 +135,4 @@ exports.getDashboardData = async (req, res) => {
     });
   }
 };
+
