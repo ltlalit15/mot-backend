@@ -4,7 +4,7 @@ const { createGarageUpload, getCombinedGarageData }= require("../controllers/Gar
 const authMiddleware = require("../Middleware/authMiddleware")
 
 router.post('/', authMiddleware, createGarageUpload)
-router.get('/:garageId', authMiddleware, getCombinedGarageData)
+router.get('/', authMiddleware, getCombinedGarageData)
 
 
 module.exports = router;
