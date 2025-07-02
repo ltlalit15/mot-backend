@@ -98,9 +98,9 @@ exports.getCombinedGarageData = async (req, res) => {
 
 exports.getGarageData = async (req, res) => {
   try {
-    const { garageId, place_id } = req.params;
+    const { garageId } = req.params;
 
-    if (!garageId || !place_id) {
+    if (!garageId) {
       return res.status(400).json({
         status: false,
         message: "garageId and place_id are required"
@@ -108,7 +108,7 @@ exports.getGarageData = async (req, res) => {
     }
 
     // Find garage with both ID and place_id match
-    const garage = await Garage.findOne({ _id: garageId, place_id: place_id });
+    const garage = await Garage.findOne({ _id: garageId });
 
     if (!garage) {
       return res.status(404).json({
