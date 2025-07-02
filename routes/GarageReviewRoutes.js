@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { createGarageReview }= require("../controllers/GarageReviewController");
+const { createGarageReview, getAllGarageReview }= require("../controllers/GarageReviewController");
 const authMiddleware = require("../Middleware/authMiddleware")
 
 router.post('/', authMiddleware, createGarageReview)
-// router.get('/', authMiddleware, getCombinedGarageData)
+router.get('/', authMiddleware, getAllGarageReview)
 
 
 module.exports = router;
