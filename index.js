@@ -111,6 +111,9 @@ app.use("/api/Activity", ActivityRoutes);
 const GarageUploadRoutes = require("./routes/GarageUploadRoutes");
 app.use("/api/GarageUpload", GarageUploadRoutes);
 
+const GarageReviewRoutes = require("./routes/GarageReviewRoutes");
+app.use("/api/GarageReview", GarageReviewRoutes);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
 
