@@ -131,6 +131,7 @@ exports.getGarageData = async (req, res) => {
       status: garage.status,
       availableService: garage.availableService,
       place_id: garage.place_id,
+      rating:garage.rating,
       uploads: uploads.map(upload => ({
         _id: upload._id,
         image: upload.image,
