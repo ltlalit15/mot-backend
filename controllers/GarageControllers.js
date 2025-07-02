@@ -7,6 +7,16 @@ const mongoose = require("mongoose");
 
 exports.createGarage = async (req, res) => {
   try {
+    const { rating } = req.body;
+
+    // ✅ Optional: validate rating is in range
+    if (rating !== undefined && (rating < 1 || rating > 5)) {
+      return res.status(400).json({
+        status: false,
+        message: "Rating must be between 1 and 5."
+      });
+    }
+
     // Create a new garage document using the request body
     const garage = new Garage({
       ...req.body, // Spread all the fields from req.body
@@ -32,7 +42,6 @@ exports.createGarage = async (req, res) => {
     });
   }
 };
-
 
 
 // exports.getAllGarages = async (req, res) => {
