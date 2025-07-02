@@ -4,15 +4,7 @@ exports.createGarageReview = async (req, res) => {
   try {
     const { garageId, service, rating, name, message } = req.body;
 
-    // Validate required fields
-    // if (!garageId || !service || !rating || !name) {
-    //   return res.status(400).json({
-    //     status: false,
-    //     message: "garageId, service, rating, and name are required."
-    //   });
-    // }
-
-    // Optional: validate rating is in range
+   // Optional: validate rating is in range
     if (rating < 1 || rating > 5) {
       return res.status(400).json({
         status: false,
@@ -45,3 +37,25 @@ exports.createGarageReview = async (req, res) => {
     });
   }
 };
+
+exports.getAllGarageReview = async (req, res) => {
+  try {
+    const reviews = await Review.find();
+
+    return res.status(200).json({
+      status: true,
+      message: "All garage reviews fetched successfully",
+      data: reviews
+    });
+
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    return res.status(500).json({
+      status: false,
+      message: "Failed to fetch garage reviews",
+      error: error.message
+    });
+  }
+};
+
+
