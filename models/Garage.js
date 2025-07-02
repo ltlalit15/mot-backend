@@ -9,6 +9,12 @@ const garageSchema = new mongoose.Schema({
   opertingHours: { type: String },
   availableService: { type: [String] },
   place_id: { type: String },
+   rating: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 5
+  },
 });
 
 module.exports = mongoose.model("Garage", garageSchema);
