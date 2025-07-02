@@ -8,6 +8,7 @@ const garageSchema = new mongoose.Schema({
   email: { type: String, require: true },
   opertingHours: { type: String },
   availableService: { type: [String] },
+  place_id: { type: String },
 });
 
 module.exports = mongoose.model("Garage", garageSchema);
