@@ -58,4 +58,26 @@ exports.getAllGarageReview = async (req, res) => {
   }
 };
 
+exports.getReviewsByGarageId = async (req, res) => {
+  const { garageId } = req.params;
+
+  try {
+    const reviews = await Review.find({ garageId }); // Filter by garageId
+
+    return res.status(200).json({
+      status: true,
+      message: "Garage reviews fetched successfully by garageId",
+      data: reviews
+    });
+
+  } catch (error) {
+    console.error("Error fetching reviews by garageId:", error);
+    return res.status(500).json({
+      status: false,
+      message: "Failed to fetch reviews for this garage",
+      error: error.message
+    });
+  }
+};
+
 
