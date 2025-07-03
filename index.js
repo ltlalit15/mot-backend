@@ -16,7 +16,7 @@ connectDB();
 
 const app = express();
 app.use(cors({
-  origin: ["http://localhost:5173", "https://mot-management.netlify.app"],
+  origin: ["http://localhost:5173", "https://management-123project.netlify.app"],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true
 }));
