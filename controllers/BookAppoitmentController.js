@@ -91,8 +91,8 @@ exports.BookAppointment = async (req, res) => {
           fullName,
           emailAddress,
           phoneNumber,
-          amount,
-          paymentPurpose
+         // amount,
+         // paymentPurpose
         }
       };
     }
