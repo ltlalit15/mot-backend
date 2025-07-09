@@ -35,8 +35,8 @@ const bookAppoitSchema = new mongoose.Schema({
       fullName: { type: String, required: true },
       emailAddress: { type: String, required: true },
       phoneNumber: { type: String, required: true },
-      amount: { type: Number, required: true },
-      paymentPurpose: { type: String, required: true }
+      //amount: { type: Number, required: true },
+     // paymentPurpose: { type: String, required: true }
     }
   },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
